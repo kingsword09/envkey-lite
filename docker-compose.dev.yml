@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  envkey-lite-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_DIR=/app/data
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - envkey_dev_data:/app/data
+    restart: unless-stopped
+    command: npm run dev
+
+volumes:
+  envkey_dev_data:
+    driver: local
