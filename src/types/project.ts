@@ -1,5 +1,4 @@
 // Project-related type definitions
-// Will be implemented in later tasks
 
 export interface Project {
   id: string
@@ -8,4 +7,37 @@ export interface Project {
   ownerId: string
   createdAt: Date
   updatedAt: Date
+}
+
+export interface Environment {
+  id: string
+  name: string
+  projectId: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ProjectPermission {
+  id: string
+  userId: string
+  projectId: string
+  role: ProjectRole
+  createdAt: Date
+}
+
+export type ProjectRole = 'owner' | 'admin' | 'editor' | 'viewer'
+
+export interface CreateProjectData {
+  name: string
+  description?: string
+  ownerId: string
+}
+
+export interface UpdateProjectData {
+  name?: string
+  description?: string
+}
+
+export interface CreateEnvironmentData {
+  name: string
 }
