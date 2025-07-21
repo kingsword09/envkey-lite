@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. 项目基础设施搭建
+- [x] 1. 项目基础设施搭建
   - 创建项目目录结构和基础配置文件
   - 配置TypeScript、ESLint、Prettier等开发工具
   - 设置package.json和依赖管理（包括Hono、PGlite、Drizzle ORM）
@@ -8,8 +8,8 @@
   - 创建基础的构建和开发脚本
   - _Requirements: 1.1, 1.2_
 
-- [ ] 2. 数据库层实现
-  - [ ] 2.1 Drizzle ORM配置和数据库管理器实现
+- [x] 2. 数据库层实现
+  - [x] 2.1 Drizzle ORM配置和数据库管理器实现
     - 配置Drizzle ORM与PGlite集成
     - 实现DatabaseManager类，封装Drizzle和PGlite操作
     - 创建数据库连接、查询、事务等基础方法
@@ -17,7 +17,7 @@
     - 编写数据库管理器的单元测试
     - _Requirements: 1.1, 1.3_
 
-  - [ ] 2.2 Drizzle Schema定义和迁移
+  - [x] 2.2 Drizzle Schema定义和迁移
     - 使用Drizzle定义完整的数据库表结构
     - 实现类型安全的数据模型定义
     - 配置Drizzle迁移系统

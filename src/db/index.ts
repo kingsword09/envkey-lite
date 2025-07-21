@@ -1,5 +1,6 @@
 // Database configuration and connection management
-// Will be implemented in later tasks
-
 export * from './schema'
 export * from './manager'
+
+// Re-export commonly used types
+export type { DatabaseConfig, QueryResult, Transaction } from './manager'
