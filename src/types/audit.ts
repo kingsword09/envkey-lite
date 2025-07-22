@@ -24,4 +24,6 @@ export interface AuditFilters {
   endDate?: Date
   limit?: number
   offset?: number
+  page?: number
+  pageSize?: number
 }

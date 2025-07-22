@@ -1,10 +1,10 @@
 import { and, eq, like, sql } from 'drizzle-orm'
 import { DatabaseManager } from '../db/manager'
-import { 
-  EnvironmentVariable, 
-  NewEnvironmentVariable, 
+import {
+  EnvironmentVariable,
+  NewEnvironmentVariable,
   environmentVariables,
-  environments
+  environments,
 } from '../db/schema'
 import { CryptoService } from './crypto.service'
 
@@ -32,7 +32,7 @@ export class EnvironmentVariableService {
 
   /**
    * Creates a new EnvironmentVariableService instance
-   * 
+   *
    * @param dbManager - The database manager instance
    * @param cryptoService - The crypto service for encrypting sensitive values
    */
@@ -43,7 +43,7 @@ export class EnvironmentVariableService {
 
   /**
    * Set an environment variable
-   * 
+   *
    * @param envId - Environment ID
    * @param key - Variable key
    * @param value - Variable value
@@ -52,9 +52,9 @@ export class EnvironmentVariableService {
    * @throws Error if environment not found
    */
   async setVariable(
-    envId: string, 
-    key: string, 
-    value: string, 
+    envId: string,
+    key: string,
+    value: string,
     options: SetVariableOptions = {}
   ): Promise<EnvironmentVariable> {
     // Validate environment ID
@@ -77,9 +77,10 @@ export class EnvironmentVariableService {
     const normalizedKey = key.trim()
 
     // Determine if value should be encrypted
-    const isSensitive = options.sensitive !== undefined 
-      ? options.sensitive 
-      : this.cryptoService.isSensitiveValue(normalizedKey)
+    const isSensitive =
+      options.sensitive !== undefined
+        ? options.sensitive
+        : this.cryptoService.isSensitiveValue(normalizedKey)
 
     // Encrypt value if sensitive
     let processedValue = value
@@ -112,7 +113,7 @@ export class EnvironmentVariableService {
           encrypted,
           sensitive: isSensitive,
           description: options.description || null,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         })
         .where(eq(environmentVariables.id, existingVar[0].id))
         .returning()
@@ -124,7 +125,7 @@ export class EnvironmentVariableService {
       // Return with decrypted value for API response
       return {
         ...updatedVar,
-        value: encrypted ? value : updatedVar.value
+        value: encrypted ? value : updatedVar.value,
       }
     } else {
       // Create new variable
@@ -134,13 +135,10 @@ export class EnvironmentVariableService {
         value: processedValue,
         encrypted,
         sensitive: isSensitive,
-        description: options.description || null
+        description: options.description || null,
       }
 
-      const [createdVar] = await db
-        .insert(environmentVariables)
-        .values(newVariable)
-        .returning()
+      const [createdVar] = await db.insert(environmentVariables).values(newVariable).returning()
 
       if (!createdVar) {
         throw new Error(`Failed to create variable ${normalizedKey}`)
@@ -149,14 +147,14 @@ export class EnvironmentVariableService {
       // Return with decrypted value for API response
       return {
         ...createdVar,
-        value: encrypted ? value : createdVar.value
+        value: encrypted ? value : createdVar.value,
       }
     }
   }
 
   /**
    * Get an environment variable
-   * 
+   *
    * @param envId - Environment ID
    * @param key - Variable key
    * @returns The environment variable or null if not found
@@ -180,10 +178,7 @@ export class EnvironmentVariableService {
       .select()
       .from(environmentVariables)
       .where(
-        and(
-          eq(environmentVariables.environmentId, envId),
-          eq(environmentVariables.key, key.trim())
-        )
+        and(eq(environmentVariables.environmentId, envId), eq(environmentVariables.key, key.trim()))
       )
 
     if (result.length === 0) {
@@ -198,10 +193,12 @@ export class EnvironmentVariableService {
         const decryptedValue = await this.cryptoService.decrypt(variable.value)
         return {
           ...variable,
-          value: decryptedValue
+          value: decryptedValue,
         }
       } catch (error) {
-        throw new Error(`Failed to decrypt variable ${key}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+        throw new Error(
+          `Failed to decrypt variable ${key}: ${error instanceof Error ? error.message : 'Unknown error'}`
+        )
       }
     }
 
@@ -210,7 +207,7 @@ export class EnvironmentVariableService {
 
   /**
    * List all environment variables for an environment
-   * 
+   *
    * @param envId - Environment ID
    * @param pattern - Optional pattern to filter variables by key
    * @returns Array of environment variables
@@ -230,16 +227,11 @@ export class EnvironmentVariableService {
 
     const db = this.dbManager.getDb()
 
-    let query = db
-      .select()
-      .from(environmentVariables)
-      .where(eq(environmentVariables.environmentId, envId))
-
     const variables = await db
       .select()
       .from(environmentVariables)
       .where(
-        pattern 
+        pattern
           ? and(
               eq(environmentVariables.environmentId, envId),
               like(environmentVariables.key, `%${pattern}%`)
@@ -248,24 +240,22 @@ export class EnvironmentVariableService {
       )
       .orderBy(environmentVariables.key)
 
-
-
     // Decrypt encrypted values
     return Promise.all(
-      variables.map(async (variable) => {
+      variables.map(async variable => {
         if (variable.encrypted) {
           try {
             const decryptedValue = await this.cryptoService.decrypt(variable.value)
             return {
               ...variable,
-              value: decryptedValue
+              value: decryptedValue,
             }
           } catch (error) {
             console.error(`Failed to decrypt variable ${variable.key}:`, error)
             // Return with placeholder for failed decryption
             return {
               ...variable,
-              value: '[DECRYPTION_FAILED]'
+              value: '[DECRYPTION_FAILED]',
             }
           }
         }
@@ -276,7 +266,7 @@ export class EnvironmentVariableService {
 
   /**
    * Delete an environment variable
-   * 
+   *
    * @param envId - Environment ID
    * @param key - Variable key
    * @returns True if variable was deleted, false if it didn't exist
@@ -299,10 +289,7 @@ export class EnvironmentVariableService {
     const result = await db
       .delete(environmentVariables)
       .where(
-        and(
-          eq(environmentVariables.environmentId, envId),
-          eq(environmentVariables.key, key.trim())
-        )
+        and(eq(environmentVariables.environmentId, envId), eq(environmentVariables.key, key.trim()))
       )
       .returning({ id: environmentVariables.id })
 
@@ -311,7 +298,7 @@ export class EnvironmentVariableService {
 
   /**
    * Set multiple environment variables at once
-   * 
+   *
    * @param envId - Environment ID
    * @param variables - Record of key-value pairs
    * @param options - Additional options for all variables
@@ -319,7 +306,7 @@ export class EnvironmentVariableService {
    * @throws Error if environment not found
    */
   async setVariables(
-    envId: string, 
+    envId: string,
     variables: Record<string, string>,
     options: SetVariableOptions = {}
   ): Promise<number> {
@@ -341,19 +328,20 @@ export class EnvironmentVariableService {
 
     for (let i = 0; i < entries.length; i += batchSize) {
       const batch = entries.slice(i, i + batchSize)
-      
-      await this.dbManager.transaction(async (tx) => {
+
+      await this.dbManager.transaction(async tx => {
         for (const [key, value] of batch) {
           if (!key || key.trim() === '') {
             continue // Skip empty keys
           }
 
           const normalizedKey = key.trim()
-          
+
           // Determine if value should be encrypted
-          const isSensitive = options.sensitive !== undefined 
-            ? options.sensitive 
-            : this.cryptoService.isSensitiveValue(normalizedKey)
+          const isSensitive =
+            options.sensitive !== undefined
+              ? options.sensitive
+              : this.cryptoService.isSensitiveValue(normalizedKey)
 
           // Encrypt value if sensitive
           let processedValue = value
@@ -384,7 +372,7 @@ export class EnvironmentVariableService {
                 encrypted,
                 sensitive: isSensitive,
                 description: options.description || null,
-                updatedAt: new Date()
+                updatedAt: new Date(),
               })
               .where(eq(environmentVariables.id, existingVar[0].id))
           } else {
@@ -395,12 +383,10 @@ export class EnvironmentVariableService {
               value: processedValue,
               encrypted,
               sensitive: isSensitive,
-              description: options.description || null
+              description: options.description || null,
             }
 
-            await tx.db
-              .insert(environmentVariables)
-              .values(newVariable)
+            await tx.db.insert(environmentVariables).values(newVariable)
           }
 
           processedCount++
@@ -413,7 +399,7 @@ export class EnvironmentVariableService {
 
   /**
    * Export environment variables to a specified format
-   * 
+   *
    * @param envId - Environment ID
    * @param format - Export format (json, dotenv, yaml)
    * @returns Formatted string of environment variables
@@ -433,7 +419,7 @@ export class EnvironmentVariableService {
     switch (format) {
       case 'json':
         return JSON.stringify(variablesObj, null, 2)
-      
+
       case 'dotenv':
         return Object.entries(variablesObj)
           .map(([key, value]) => {
@@ -442,26 +428,26 @@ export class EnvironmentVariableService {
               .replace(/\n/g, '\\n')
               .replace(/\r/g, '\\r')
               .replace(/"/g, '\\"')
-            
+
             // Wrap value in quotes if it contains spaces or special characters
             const needsQuotes = /[\s#;,]/.test(value)
             const formattedValue = needsQuotes ? `"${escapedValue}"` : escapedValue
-            
+
             return `${key}=${formattedValue}`
           })
           .join('\n')
-      
+
       case 'yaml':
         return Object.entries(variablesObj)
           .map(([key, value]) => {
             // Escape special characters in YAML
             const needsQuotes = /[:#{}[\],&*?|<>=!%@\`]/.test(value) || value === ''
             const formattedValue = needsQuotes ? `"${value.replace(/"/g, '\\"')}"` : value
-            
+
             return `${key}: ${formattedValue}`
           })
           .join('\n')
-      
+
       default:
         throw new Error(`Unsupported export format: ${format}`)
     }
@@ -469,7 +455,7 @@ export class EnvironmentVariableService {
 
   /**
    * Import environment variables from a formatted string
-   * 
+   *
    * @param envId - Environment ID
    * @param data - Formatted string of environment variables
    * @param format - Import format (json, dotenv, yaml)
@@ -491,7 +477,7 @@ export class EnvironmentVariableService {
     const result: ImportResult = {
       imported: 0,
       skipped: 0,
-      errors: []
+      errors: [],
     }
 
     let variables: Record<string, string> = {}
@@ -506,18 +492,20 @@ export class EnvironmentVariableService {
               throw new Error('JSON must contain an object with key-value pairs')
             }
           } catch (error) {
-            throw new Error(`Invalid JSON format: ${error instanceof Error ? error.message : 'Unknown error'}`)
+            throw new Error(
+              `Invalid JSON format: ${error instanceof Error ? error.message : 'Unknown error'}`
+            )
           }
           break
-        
+
         case 'dotenv':
           variables = this.parseDotEnv(data)
           break
-        
+
         case 'yaml':
           variables = this.parseYaml(data)
           break
-        
+
         default:
           throw new Error(`Unsupported import format: ${format}`)
       }
@@ -535,7 +523,7 @@ export class EnvironmentVariableService {
         } catch (error) {
           result.errors.push({
             key,
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: error instanceof Error ? error.message : 'Unknown error',
           })
         }
       }
@@ -548,7 +536,7 @@ export class EnvironmentVariableService {
 
   /**
    * Copy all environment variables from one environment to another
-   * 
+   *
    * @param sourceEnvId - Source environment ID
    * @param targetEnvId - Target environment ID
    * @param overwrite - Whether to overwrite existing variables in target
@@ -556,8 +544,8 @@ export class EnvironmentVariableService {
    * @throws Error if either environment not found
    */
   async copyVariables(
-    sourceEnvId: string, 
-    targetEnvId: string, 
+    sourceEnvId: string,
+    targetEnvId: string,
     overwrite: boolean = false
   ): Promise<number> {
     // Validate environment IDs
@@ -578,7 +566,7 @@ export class EnvironmentVariableService {
 
     // Get all variables from source environment
     const sourceVariables = await this.listVariables(sourceEnvId)
-    
+
     if (sourceVariables.length === 0) {
       return 0 // No variables to copy
     }
@@ -596,8 +584,8 @@ export class EnvironmentVariableService {
 
     for (let i = 0; i < sourceVariables.length; i += batchSize) {
       const batch = sourceVariables.slice(i, i + batchSize)
-      
-      await this.dbManager.transaction(async (tx) => {
+
+      await this.dbManager.transaction(async tx => {
         for (const variable of batch) {
           // Skip if variable exists in target and overwrite is false
           if (!overwrite && existingKeys.has(variable.key)) {
@@ -611,7 +599,7 @@ export class EnvironmentVariableService {
             value: variable.value,
             encrypted: variable.encrypted,
             sensitive: variable.sensitive,
-            description: variable.description
+            description: variable.description,
           }
 
           // Re-encrypt if necessary (value was decrypted during listVariables)
@@ -640,14 +628,12 @@ export class EnvironmentVariableService {
                 encrypted: newVariable.encrypted,
                 sensitive: newVariable.sensitive,
                 description: newVariable.description,
-                updatedAt: new Date()
+                updatedAt: new Date(),
               })
               .where(eq(environmentVariables.id, existingVar[0].id))
           } else if (existingVar.length === 0) {
             // Create new variable
-            await tx.db
-              .insert(environmentVariables)
-              .values(newVariable)
+            await tx.db.insert(environmentVariables).values(newVariable)
           } else {
             // Skip (existing and !overwrite)
             continue
@@ -663,7 +649,7 @@ export class EnvironmentVariableService {
 
   /**
    * Search for environment variables by key pattern
-   * 
+   *
    * @param envId - Environment ID
    * @param pattern - Search pattern
    * @returns Array of matching environment variables
@@ -675,7 +661,7 @@ export class EnvironmentVariableService {
 
   /**
    * Get variables by prefix
-   * 
+   *
    * @param envId - Environment ID
    * @param prefix - Key prefix
    * @returns Array of matching environment variables
@@ -708,20 +694,20 @@ export class EnvironmentVariableService {
 
     // Decrypt encrypted values
     return Promise.all(
-      variables.map(async (variable) => {
+      variables.map(async variable => {
         if (variable.encrypted) {
           try {
             const decryptedValue = await this.cryptoService.decrypt(variable.value)
             return {
               ...variable,
-              value: decryptedValue
+              value: decryptedValue,
             }
           } catch (error) {
             console.error(`Failed to decrypt variable ${variable.key}:`, error)
             // Return with placeholder for failed decryption
             return {
               ...variable,
-              value: '[DECRYPTION_FAILED]'
+              value: '[DECRYPTION_FAILED]',
             }
           }
         }
@@ -732,7 +718,7 @@ export class EnvironmentVariableService {
 
   /**
    * Delete variables by prefix
-   * 
+   *
    * @param envId - Environment ID
    * @param prefix - Key prefix
    * @returns Number of variables deleted
@@ -767,24 +753,24 @@ export class EnvironmentVariableService {
 
   /**
    * Check if an environment exists
-   * 
+   *
    * @param envId - Environment ID
    * @returns True if environment exists, false otherwise
    */
   private async environmentExists(envId: string): Promise<boolean> {
     const db = this.dbManager.getDb()
-    
+
     const result = await db
       .select({ id: environments.id })
       .from(environments)
       .where(eq(environments.id, envId))
-    
+
     return result.length > 0
   }
 
   /**
    * Validate if a string is a valid UUID
-   * 
+   *
    * @param id - String to validate
    * @returns True if valid UUID, false otherwise
    */
@@ -795,66 +781,68 @@ export class EnvironmentVariableService {
 
   /**
    * Parse a dotenv format string into key-value pairs
-   * 
+   *
    * @param data - Dotenv format string
    * @returns Record of key-value pairs
    */
   private parseDotEnv(data: string): Record<string, string> {
     const result: Record<string, string> = {}
-    
+
     // Split by lines and process each line
     const lines = data.split(/\r?\n/)
-    
+
     for (const line of lines) {
       // Skip empty lines and comments
       const trimmedLine = line.trim()
       if (!trimmedLine || trimmedLine.startsWith('#')) {
         continue
       }
-      
+
       // Find the first equals sign (not escaped)
       let equalsIndex = -1
       let inQuote = false
       let escapeNext = false
-      
+
       for (let i = 0; i < trimmedLine.length; i++) {
         const char = trimmedLine[i]
-        
+
         if (escapeNext) {
           escapeNext = false
           continue
         }
-        
+
         if (char === '\\') {
           escapeNext = true
           continue
         }
-        
+
         if (char === '"' || char === "'") {
           inQuote = !inQuote
           continue
         }
-        
+
         if (char === '=' && !inQuote) {
           equalsIndex = i
           break
         }
       }
-      
+
       if (equalsIndex === -1) {
         continue // No equals sign found
       }
-      
+
       // Extract key and value
       const key = trimmedLine.substring(0, equalsIndex).trim()
       let value = trimmedLine.substring(equalsIndex + 1).trim()
-      
+
       // Remove quotes if present
-      if ((value.startsWith('"') && value.endsWith('"')) || 
-          (value.startsWith("'") && value.endsWith("'"))) {
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
         value = value.substring(1, value.length - 1)
       }
-      
+
       // Unescape characters
       value = value
         .replace(/\\n/g, '\n')
@@ -863,78 +851,80 @@ export class EnvironmentVariableService {
         .replace(/\\\\/g, '\\')
         .replace(/\\"/g, '"')
         .replace(/\\'/g, "'")
-      
+
       result[key] = value
     }
-    
+
     return result
   }
 
   /**
    * Parse a YAML format string into key-value pairs
-   * 
+   *
    * @param data - YAML format string
    * @returns Record of key-value pairs
    */
   private parseYaml(data: string): Record<string, string> {
     const result: Record<string, string> = {}
-    
+
     // Split by lines and process each line
     const lines = data.split(/\r?\n/)
-    
+
     for (const line of lines) {
       // Skip empty lines and comments
       const trimmedLine = line.trim()
       if (!trimmedLine || trimmedLine.startsWith('#')) {
         continue
       }
-      
+
       // Find the first colon (not in a quoted string)
       let colonIndex = -1
       let inQuote = false
       let escapeNext = false
-      
+
       for (let i = 0; i < trimmedLine.length; i++) {
         const char = trimmedLine[i]
-        
+
         if (escapeNext) {
           escapeNext = false
           continue
         }
-        
+
         if (char === '\\') {
           escapeNext = true
           continue
         }
-        
+
         if (char === '"' || char === "'") {
           inQuote = !inQuote
           continue
         }
-        
+
         if (char === ':' && !inQuote) {
           colonIndex = i
           break
         }
       }
-      
+
       if (colonIndex === -1) {
         continue // No colon found
       }
-      
+
       // Extract key and value
       const key = trimmedLine.substring(0, colonIndex).trim()
       let value = trimmedLine.substring(colonIndex + 1).trim()
-      
+
       // Remove quotes if present
-      if ((value.startsWith('"') && value.endsWith('"')) || 
-          (value.startsWith("'") && value.endsWith("'"))) {
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
         value = value.substring(1, value.length - 1)
       }
-      
+
       result[key] = value
     }
-    
+
     return result
   }
 }
