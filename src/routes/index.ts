@@ -1,2 +1,5 @@
 // Route exports
-// Routes will be exported as they are implemented
+export { createAuthRoutes } from './auth.routes'
+export { createProjectRoutes } from './projects.routes'
+export { createEnvironmentRoutes } from './environment.routes'
+export { createAuditRoutes } from './audit.routes'
