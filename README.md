@@ -105,6 +105,69 @@ The application can be configured using environment variables. See `.env.example
 - `JWT_SECRET` - Secret for JWT token signing
 - `ENCRYPTION_KEY` - Key for encrypting sensitive data
 
+### Security Configuration
+
+- `HTTPS_ENABLED` - Enable HTTPS server (default: false)
+- `SSL_CERT_PATH` - Path to SSL certificate file
+- `SSL_KEY_PATH` - Path to SSL private key file
+- `HTTPS_PORT` - HTTPS server port (default: 3443)
+- `FORCE_HTTPS` - Redirect HTTP to HTTPS (default: false)
+- `SECURITY_HEADERS_ENABLED` - Enable security headers (default: true)
+- `CSP_ENABLED` - Enable Content Security Policy (default: true)
+- `HSTS_ENABLED` - Enable HTTP Strict Transport Security (default: true)
+- `HSTS_MAX_AGE` - HSTS max age in seconds (default: 31536000)
+- `FRAME_OPTIONS` - X-Frame-Options header value (default: DENY)
+
+## Security Features
+
+EnvKey Lite includes comprehensive security features to protect your environment variables and application:
+
+### Security Headers
+
+The application automatically adds security headers to all responses:
+
+- **Content Security Policy (CSP)** - Prevents XSS attacks by controlling resource loading
+- **X-Frame-Options** - Prevents clickjacking attacks
+- **X-Content-Type-Options** - Prevents MIME type sniffing
+- **X-XSS-Protection** - Enables browser XSS filtering
+- **Referrer-Policy** - Controls referrer information sent with requests
+- **Permissions-Policy** - Controls browser feature access
+- **Cross-Origin-* Headers** - Controls cross-origin resource sharing
+
+### HTTPS Support
+
+For production deployments, HTTPS is strongly recommended:
+
+1. Generate or obtain SSL certificates
+2. Configure SSL certificate paths in environment variables
+3. Enable HTTPS in configuration
+4. Optionally enable HTTP to HTTPS redirection
+
+Example HTTPS configuration:
+```bash
+HTTPS_ENABLED=true
+SSL_CERT_PATH=/path/to/certificate.crt
+SSL_KEY_PATH=/path/to/private.key
+HTTPS_PORT=3443
+FORCE_HTTPS=true
+```
+
+### Data Encryption
+
+- Environment variables marked as sensitive are encrypted at rest
+- JWT tokens are signed with configurable secrets
+- API keys are hashed before storage
+- All sensitive configuration requires secure keys in production
+
+### Security Validation
+
+The application validates security configuration on startup and provides warnings for:
+
+- Missing HTTPS in production
+- Weak JWT secrets
+- Insecure CORS settings
+- Missing SSL certificates when HTTPS is enabled
+
 ## API Documentation
 
 API documentation will be available at `/docs` when the application is running.

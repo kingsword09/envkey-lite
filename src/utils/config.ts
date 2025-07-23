@@ -21,6 +21,20 @@ const configSchema = z.object({
   // CORS configuration
   CORS_ORIGIN: z.string().default('*'),
 
+  // HTTPS configuration
+  HTTPS_ENABLED: z.string().default('false').transform(val => val === 'true'),
+  SSL_CERT_PATH: z.string().optional(),
+  SSL_KEY_PATH: z.string().optional(),
+  HTTPS_PORT: z.string().default('3443').transform(Number),
+  FORCE_HTTPS: z.string().default('false').transform(val => val === 'true'),
+
+  // Security headers configuration
+  SECURITY_HEADERS_ENABLED: z.string().default('true').transform(val => val === 'true'),
+  CSP_ENABLED: z.string().default('true').transform(val => val === 'true'),
+  HSTS_ENABLED: z.string().default('true').transform(val => val === 'true'),
+  HSTS_MAX_AGE: z.string().default('31536000').transform(Number), // 1 year
+  FRAME_OPTIONS: z.enum(['DENY', 'SAMEORIGIN']).default('DENY'),
+
   // Logging configuration
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
 
@@ -178,8 +192,10 @@ export function loadConfig(): Config {
     console.log('Configuration loaded successfully:')
     console.log(`  - Environment: ${config.NODE_ENV}`)
     console.log(`  - Server: ${config.HOST}:${config.PORT}`)
+    console.log(`  - HTTPS: ${config.HTTPS_ENABLED ? `Enabled on port ${config.HTTPS_PORT}` : 'Disabled'}`)
     console.log(`  - Database: ${config.DATABASE_DIR ? 'File-based' : 'In-memory'}`)
     console.log(`  - Log Level: ${config.LOG_LEVEL}`)
+    console.log(`  - Security Headers: ${config.SECURITY_HEADERS_ENABLED ? 'Enabled' : 'Disabled'}`)
     console.log(`  - Health Check: ${config.HEALTH_CHECK_ENABLED ? 'Enabled' : 'Disabled'}`)
     
     return config
