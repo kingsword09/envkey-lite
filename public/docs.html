@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnvKey Lite API Documentation</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .header {
+            background: #1f2937;
+            color: white;
+            padding: 1rem 2rem;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .content {
+            padding: 2rem;
+        }
+        .example {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>EnvKey Lite API Documentation</h1>
+        <p>A lightweight self-hosted environment variable management system</p>
+    </div>
+
+    <div class="content">
+        <h2>Authentication</h2>
+        
+        <div class="example">
+            <h3>Login</h3>
+            <div class="code-block">curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "your-password"}'</div>
+        </div>
+
+        <div class="example">
+            <h3>Get Environment Variables</h3>
+            <div class="code-block">curl -X GET http://localhost:3000/api/client/env-uuid \
+  -H "X-API-Key: ak_1234567890abcdef..."</div>
+        </div>
+    </div>
+</body>
+</html>

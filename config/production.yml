@@ -1,0 +1,258 @@
+# EnvKey Lite Production Configuration Template
+# This file contains production-ready configuration settings
+
+# =============================================================================
+# APPLICATION CONFIGURATION
+# =============================================================================
+
+app:
+  name: EnvKey Lite
+  version: 1.0.0
+  environment: production
+  
+  # Server settings
+  server:
+    host: 0.0.0.0
+    port: 3000
+    https_port: 3443
+    
+  # Database settings
+  database:
+    dir: /app/data
+    pool_size: 10
+    connection_timeout: 30000
+    
+  # Session settings
+  session:
+    timeout: 3600
+    secret: ${JWT_SECRET}
+
+# =============================================================================
+# SECURITY CONFIGURATION
+# =============================================================================
+
+security:
+  # HTTPS configuration
+  https:
+    enabled: true
+    force_redirect: true
+    cert_path: /etc/ssl/certs/envkey-lite.crt
+    key_path: /etc/ssl/private/envkey-lite.key
+    
+  # Security headers
+  headers:
+    enabled: true
+    csp_enabled: true
+    hsts_enabled: true
+    hsts_max_age: 31536000
+    frame_options: DENY
+    
+  # CORS settings
+  cors:
+    origins:
+      - https://your-domain.com
+      - https://app.your-domain.com
+    credentials: true
+    
+  # Rate limiting
+  rate_limit:
+    enabled: true
+    window_ms: 900000
+    max_requests: 100
+    api_window_ms: 60000
+    api_max_requests: 1000
+
+# =============================================================================
+# LOGGING CONFIGURATION
+# =============================================================================
+
+logging:
+  level: info
+  format: json
+  
+  # File logging
+  file:
+    enabled: true
+    path: /var/log/envkey-lite/app.log
+    max_size: 100MB
+    max_files: 10
+    compress: true
+    
+  # Console logging
+  console:
+    enabled: true
+    format: text
+    
+  # Request logging
+  requests:
+    enabled: true
+    exclude_paths:
+      - /health
+      - /metrics
+
+# =============================================================================
+# MONITORING CONFIGURATION
+# =============================================================================
+
+monitoring:
+  # Health checks
+  health:
+    enabled: true
+    endpoint: /health
+    
+  # Metrics
+  metrics:
+    enabled: true
+    endpoint: /metrics
+    prometheus: true
+    
+  # Performance monitoring
+  performance:
+    enabled: true
+    sampling_rate: 0.1
+
+# =============================================================================
+# BACKUP CONFIGURATION
+# =============================================================================
+
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  directory: /backup/envkey-lite
+  
+  # Backup components
+  include:
+    database: true
+    config: true
+    application: false
+    
+  # Notification
+  notification:
+    webhook: ${BACKUP_NOTIFICATION_WEBHOOK}
+
+# =============================================================================
+# EMAIL CONFIGURATION
+# =============================================================================
+
+email:
+  enabled: false
+  smtp:
+    host: smtp.your-domain.com
+    port: 587
+    secure: true
+    user: noreply@your-domain.com
+    password: ${SMTP_PASSWORD}
+    
+  # Email templates
+  templates:
+    from: EnvKey Lite <noreply@your-domain.com>
+    admin: admin@your-domain.com
+
+# =============================================================================
+# ALERTING CONFIGURATION
+# =============================================================================
+
+alerting:
+  enabled: true
+  
+  # Alert channels
+  channels:
+    email:
+      enabled: false
+      recipients:
+        - admin@your-domain.com
+        
+    webhook:
+      enabled: true
+      url: ${ALERT_WEBHOOK_URL}
+      
+  # Alert rules
+  rules:
+    high_error_rate:
+      threshold: 0.05
+      duration: 5m
+      severity: critical
+      
+    database_connection_failed:
+      duration: 1m
+      severity: critical
+      
+    disk_space_low:
+      threshold: 90
+      duration: 10m
+      severity: warning
+      
+    memory_usage_high:
+      threshold: 90
+      duration: 15m
+      severity: warning
+
+# =============================================================================
+# PERFORMANCE TUNING
+# =============================================================================
+
+performance:
+  # Node.js settings
+  node:
+    max_old_space_size: 2048
+    max_semi_space_size: 128
+    
+  # HTTP settings
+  http:
+    keep_alive_timeout: 65000
+    headers_timeout: 66000
+    max_header_size: 16384
+    
+  # Database settings
+  database:
+    checkpoint_interval: 300000
+    wal_autocheckpoint: 1000
+    cache_size: 10000
+
+# =============================================================================
+# DEPLOYMENT CONFIGURATION
+# =============================================================================
+
+deployment:
+  # Container settings
+  container:
+    user: envkey
+    group: envkey
+    
+  # File permissions
+  permissions:
+    data_dir: 755
+    config_files: 644
+    log_files: 644
+    
+  # Resource limits
+  resources:
+    memory_limit: 2Gi
+    cpu_limit: 1000m
+    disk_limit: 10Gi
+
+# =============================================================================
+# MAINTENANCE CONFIGURATION
+# =============================================================================
+
+maintenance:
+  # Automatic cleanup
+  cleanup:
+    enabled: true
+    schedule: "0 3 * * 0"  # Weekly on Sunday at 3 AM
+    
+    # Cleanup targets
+    audit_logs:
+      retention_days: 365
+      max_size: 1GB
+      
+    temp_files:
+      retention_hours: 24
+      
+  # Health checks
+  health_checks:
+    database: true
+    disk_space: true
+    memory: true
+    api_response: true

@@ -6,6 +6,7 @@ import { corsMiddleware, errorHandler, loggerMiddleware, securityHeaders, httpsR
 import { DatabaseManager } from './db/manager'
 import { CryptoService } from './services/crypto.service'
 import { createAuthRoutes, createProjectRoutes } from './routes'
+import { createDocsRoutes } from './routes/docs.routes'
 import { config } from './utils/config'
 import { createServers, startServers, validateHttpsConfig, type ServerConfig } from './utils/https-server'
 
@@ -126,9 +127,11 @@ async function initializeServices() {
   // Mount API routes
   const authRoutes = createAuthRoutes(dbManager, cryptoService, config.JWT_SECRET)
   const projectRoutes = createProjectRoutes(dbManager, cryptoService, config.JWT_SECRET)
+  const docsRoutes = createDocsRoutes()
   
   app.route('/api/auth', authRoutes)
   app.route('/api/projects', projectRoutes)
+  app.route('/docs', docsRoutes)
 }
 
 export async function main(): Promise<void> {
