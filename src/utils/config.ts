@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { readFileSync, existsSync } from 'fs'
-import { join } from 'path'
+// import { join } from 'path' // Removed unused import
 
 // Environment configuration schema
 const configSchema = z.object({

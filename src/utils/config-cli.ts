@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { join } from 'path'
+import { writeFileSync, existsSync } from 'fs'
 import { validateConfigFile, loadConfig } from './config'
 
 // CLI commands
@@ -115,7 +114,7 @@ HEALTH_CHECK_PATH=/health
 }
 
 // Check current configuration
-function checkCommand(args: string[]) {
+function checkCommand(_args: string[]): void {
   try {
     console.log('Checking current configuration...\n')
     
@@ -174,7 +173,7 @@ function checkCommand(args: string[]) {
 }
 
 // Show help information
-function helpCommand(args: string[]) {
+function helpCommand(_args: string[]): void {
   console.log(`
 EnvKey Lite Configuration CLI
 

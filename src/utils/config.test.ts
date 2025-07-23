@@ -9,7 +9,7 @@ vi.mock('./config', async () => {
   }
 })
 
-import { loadConfig, validateConfigFile, getConfigValue, isProduction, isDevelopment, isTest } from './config'
+import { loadConfig } from './config'
 
 describe('Configuration Management', () => {
   const originalEnv = process.env

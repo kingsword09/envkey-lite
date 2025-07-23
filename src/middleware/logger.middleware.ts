@@ -11,7 +11,7 @@ export interface LoggerOptions {
 
 export const loggerMiddleware = (options: LoggerOptions = {}): MiddlewareHandler => {
   const {
-    logLevel = 'info',
+    logLevel: _logLevel = 'info',
     logRequests = true,
     logResponses = true,
     logHeaders = false,

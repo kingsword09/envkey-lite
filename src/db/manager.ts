@@ -287,7 +287,7 @@ export class DatabaseManager {
    * This is a utility method that can be used in scripts
    * @param name The name of the migration
    */
-  static async generateMigration(name: string): Promise<void> {
+  static async generateMigration(_name: string): Promise<void> {
     try {
       // This would typically call drizzle-kit generate command
       // In a real implementation, this would use execa or similar to run the CLI

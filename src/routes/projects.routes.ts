@@ -7,7 +7,7 @@ import {
   createAuthMiddleware, 
   getCurrentUser,
   isAdmin,
-  isOwner
+
 } from '../middleware/auth.middleware'
 import { UserService } from '../services/user.service'
 import { CryptoService } from '../services/crypto.service'
@@ -40,7 +40,7 @@ export function createProjectRoutes(
 
   // Create a new project
   app.post('/',
-    validator('json', (value, c) => {
+    validator('json', (value, _c) => {
       const { name, description } = value as any
       
       if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -185,7 +185,7 @@ export function createProjectRoutes(
 
   // Update a project
   app.put('/:projectId',
-    validator('json', (value, c) => {
+    validator('json', (value, _c) => {
       const { name, description } = value as any
       
       const updateData: UpdateProjectData = {}
@@ -299,7 +299,7 @@ export function createProjectRoutes(
 
   // Create a new environment for a project
   app.post('/:projectId/environments',
-    validator('json', (value, c) => {
+    validator('json', (value, _c) => {
       const { name } = value as any
       
       if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -559,7 +559,7 @@ export function createProjectRoutes(
 
   // Grant permission to a user
   app.post('/:projectId/permissions',
-    validator('json', (value, c) => {
+    validator('json', (value, _c) => {
       const { userId, role } = value as any
       
       if (!userId || typeof userId !== 'string') {
@@ -675,7 +675,7 @@ export function createProjectRoutes(
 
   // Transfer project ownership
   app.post('/:projectId/transfer-ownership',
-    validator('json', (value, c) => {
+    validator('json', (value, _c) => {
       const { newOwnerId } = value as unknown
       
       if (!newOwnerId || typeof newOwnerId !== 'string') {

@@ -7,8 +7,7 @@ import { DatabaseManager } from '../db/manager'
 import { 
   generateJWTToken, 
   createAuthMiddleware, 
-  getCurrentUser,
-  AuthContext 
+  getCurrentUser
 } from '../middleware/auth.middleware'
 import { 
   LoginRequest, 
@@ -43,7 +42,7 @@ export function createAuthRoutes(
 
   // User registration endpoint
   app.post('/register', 
-    validator('json', (value, c) => {
+    validator('json', (value, _c) => {
       const { email, name, password, role } = value as any
       
       if (!email || typeof email !== 'string' || !email.includes('@')) {
@@ -120,7 +119,7 @@ export function createAuthRoutes(
 
   // User login endpoint
   app.post('/login',
-    validator('json', (value, c) => {
+    validator('json', (value, _c) => {
       const { email, password } = value as any
       
       if (!email || typeof email !== 'string' || !email.includes('@')) {
@@ -212,7 +211,7 @@ export function createAuthRoutes(
   // Update user profile
   app.put('/me',
     authMiddleware,
-    validator('json', (value, c) => {
+    validator('json', (value, _c) => {
       const { name, email } = value as any
       
       const updateData: UpdateUserData = {}
@@ -285,7 +284,7 @@ export function createAuthRoutes(
   // Change password
   app.post('/change-password',
     authMiddleware,
-    validator('json', (value, c) => {
+    validator('json', (value, _c) => {
       const { currentPassword, newPassword } = value as any
       
       if (!currentPassword || typeof currentPassword !== 'string') {
@@ -354,7 +353,7 @@ export function createAuthRoutes(
   // Create API key
   app.post('/api-keys',
     authMiddleware,
-    validator('json', (value, c) => {
+    validator('json', (value, _c) => {
       const { name } = value as any
       
       if (!name || typeof name !== 'string' || name.trim().length === 0) {

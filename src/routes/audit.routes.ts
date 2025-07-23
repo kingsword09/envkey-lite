@@ -40,7 +40,7 @@ export function createAuditRoutes(
 
   // Get audit logs with filtering and pagination
   app.get('/logs',
-    validator('query', (value, c) => {
+    validator('query', (value, _c) => {
       const {
         userId,
         action,
@@ -282,7 +282,7 @@ export function createAuditRoutes(
 
   // Search audit logs (admin only)
   app.get('/logs/search',
-    validator('query', (value, c) => {
+    validator('query', (value, _c) => {
       const { q, userId, action, resource, startDate, endDate, page, pageSize } = value as any
 
       if (!q || typeof q !== 'string' || q.trim().length === 0) {
@@ -495,7 +495,7 @@ export function createAuditRoutes(
 
   // Clean up old audit logs (admin only)
   app.post('/cleanup',
-    validator('json', (value, c) => {
+    validator('json', (value, _c) => {
       const { retentionDays } = value as any
 
       if (retentionDays !== undefined) {
