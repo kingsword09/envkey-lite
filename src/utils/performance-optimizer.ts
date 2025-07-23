@@ -163,7 +163,7 @@ export class PerformanceOptimizer {
       },
       systemMetrics: {
         uptime,
-        loadAverage: process.platform === 'linux' ? require('os').loadavg() : [0, 0, 0],
+        loadAverage: process.platform === 'linux' ? (await import('os')).loadavg() : [0, 0, 0],
         cpuUsage
       }
     }
@@ -212,8 +212,8 @@ export class PerformanceOptimizer {
         try {
           await db.execute(sql.raw(indexQuery))
           applied.push(indexQuery)
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+        } catch (_error) {
+          const errorMessage = _error instanceof Error ? _error.message : 'Unknown error'
           errors.push(`Failed to create index: ${indexQuery} - ${errorMessage}`)
         }
       }
@@ -299,19 +299,19 @@ export class PerformanceOptimizer {
       ])
       
       return {
-        tableStats: tableStats.rows.map((row: any) => ({
-          tableName: row.table_name,
-          rowCount: parseInt(row.row_count) || 0,
-          sizeBytes: parseInt(row.size_bytes) || 0
+        tableStats: tableStats.rows.map((row: Record<string, unknown>) => ({
+          tableName: row.table_name as string,
+          rowCount: parseInt(row.row_count as string) || 0,
+          sizeBytes: parseInt(row.size_bytes as string) || 0
         })),
-        indexStats: indexStats.rows.map((row: any) => ({
-          indexName: row.index_name,
-          tableName: row.table_name,
-          sizeBytes: parseInt(row.size_bytes) || 0,
-          scans: parseInt(row.scans) || 0
+        indexStats: indexStats.rows.map((row: Record<string, unknown>) => ({
+          indexName: row.index_name as string,
+          tableName: row.table_name as string,
+          sizeBytes: parseInt(row.size_bytes as string) || 0,
+          scans: parseInt(row.scans as string) || 0
         }))
       }
-    } catch (error) {
+    } catch (_error) {
       // Fallback for non-PostgreSQL databases
       return {
         tableStats: [],
@@ -371,22 +371,22 @@ export class PerformanceOptimizer {
  * Query performance monitoring decorator
  */
 export function monitorQuery(optimizer: PerformanceOptimizer) {
-  return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
+  return function (target: unknown, propertyName: string, descriptor: PropertyDescriptor): PropertyDescriptor {
     const method = descriptor.value
     
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]): Promise<unknown> {
       const startTime = performance.now()
       
       try {
-        const result = await method.apply(this, args)
+        const result = await (method as (...args: unknown[]) => Promise<unknown>).apply(this, args)
         const duration = performance.now() - startTime
         
-        optimizer.recordQuery(`${target.constructor.name}.${propertyName}`, duration)
+        optimizer.recordQuery(`${(target as { constructor: { name: string } }).constructor.name}.${propertyName}`, duration)
         
         return result
       } catch (error) {
         const duration = performance.now() - startTime
-        optimizer.recordQuery(`${target.constructor.name}.${propertyName} (ERROR)`, duration)
+        optimizer.recordQuery(`${(target as { constructor: { name: string } }).constructor.name}.${propertyName} (ERROR)`, duration)
         throw error
       }
     }

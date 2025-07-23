@@ -12,7 +12,7 @@ const commands = {
 }
 
 // Main CLI entry point
-function main() {
+function main(): void {
   const args = process.argv.slice(2)
   const command = args[0] || 'help'
   
@@ -26,10 +26,10 @@ function main() {
 }
 
 // Validate configuration file
-function validateCommand(args: string[]) {
+function validateCommand(args: string[]): void {
   const filePath = args[0] || '.env'
   
-  console.log(`Validating configuration file: ${filePath}`)
+  console.warn(`Validating configuration file: ${filePath}`)
   
   if (!existsSync(filePath)) {
     console.error(`Configuration file not found: ${filePath}`)
@@ -39,16 +39,16 @@ function validateCommand(args: string[]) {
   const isValid = validateConfigFile(filePath)
   
   if (isValid) {
-    console.log('✅ Configuration is valid')
+    console.warn('✅ Configuration is valid')
     process.exit(0)
   } else {
-    console.log('❌ Configuration is invalid')
+    console.warn('❌ Configuration is invalid')
     process.exit(1)
   }
 }
 
 // Generate example configuration file
-function generateCommand(args: string[]) {
+function generateCommand(args: string[]): void {
   const outputPath = args[0] || '.env'
   
   if (existsSync(outputPath) && !args.includes('--force')) {
@@ -105,8 +105,8 @@ HEALTH_CHECK_PATH=/health
   
   try {
     writeFileSync(outputPath, exampleConfig)
-    console.log(`✅ Configuration file generated: ${outputPath}`)
-    console.log('⚠️  Please review and update the generated values, especially secrets!')
+    console.warn(`✅ Configuration file generated: ${outputPath}`)
+    console.warn('⚠️  Please review and update the generated values, especially secrets!')
   } catch (error) {
     console.error(`Failed to generate configuration file: ${error}`)
     process.exit(1)
@@ -116,55 +116,55 @@ HEALTH_CHECK_PATH=/health
 // Check current configuration
 function checkCommand(_args: string[]): void {
   try {
-    console.log('Checking current configuration...\n')
+    console.warn('Checking current configuration...\n')
     
     const config = loadConfig()
     
-    console.log('📋 Configuration Summary:')
-    console.log(`   Environment: ${config.NODE_ENV}`)
-    console.log(`   Server: ${config.HOST}:${config.PORT}`)
-    console.log(`   Database: ${config.DATABASE_DIR ? `File-based (${config.DATABASE_DIR})` : 'In-memory'}`)
-    console.log(`   Log Level: ${config.LOG_LEVEL}`)
-    console.log(`   App Name: ${config.APP_NAME}`)
-    console.log(`   App Version: ${config.APP_VERSION}`)
-    console.log(`   API Key Prefix: ${config.API_KEY_PREFIX}`)
-    console.log(`   CORS Origin: ${config.CORS_ORIGIN}`)
-    console.log(`   Rate Limit: ${config.RATE_LIMIT_MAX_REQUESTS} requests per ${config.RATE_LIMIT_WINDOW_MS}ms`)
-    console.log(`   Session Timeout: ${config.SESSION_TIMEOUT_HOURS} hours`)
-    console.log(`   Audit Retention: ${config.AUDIT_LOG_RETENTION_DAYS} days`)
-    console.log(`   Health Check: ${config.HEALTH_CHECK_ENABLED ? 'Enabled' : 'Disabled'} (${config.HEALTH_CHECK_PATH})`)
+    console.warn('📋 Configuration Summary:')
+    console.warn(`   Environment: ${config.NODE_ENV}`)
+    console.warn(`   Server: ${config.HOST}:${config.PORT}`)
+    console.warn(`   Database: ${config.DATABASE_DIR ? `File-based (${config.DATABASE_DIR})` : 'In-memory'}`)
+    console.warn(`   Log Level: ${config.LOG_LEVEL}`)
+    console.warn(`   App Name: ${config.APP_NAME}`)
+    console.warn(`   App Version: ${config.APP_VERSION}`)
+    console.warn(`   API Key Prefix: ${config.API_KEY_PREFIX}`)
+    console.warn(`   CORS Origin: ${config.CORS_ORIGIN}`)
+    console.warn(`   Rate Limit: ${config.RATE_LIMIT_MAX_REQUESTS} requests per ${config.RATE_LIMIT_WINDOW_MS}ms`)
+    console.warn(`   Session Timeout: ${config.SESSION_TIMEOUT_HOURS} hours`)
+    console.warn(`   Audit Retention: ${config.AUDIT_LOG_RETENTION_DAYS} days`)
+    console.warn(`   Health Check: ${config.HEALTH_CHECK_ENABLED ? 'Enabled' : 'Disabled'} (${config.HEALTH_CHECK_PATH})`)
     
     if (config.ADMIN_EMAIL) {
-      console.log(`   Admin User: ${config.ADMIN_EMAIL} (${config.ADMIN_NAME})`)
+      console.warn(`   Admin User: ${config.ADMIN_EMAIL} (${config.ADMIN_NAME})`)
     } else {
-      console.log('   Admin User: Not configured')
+      console.warn('   Admin User: Not configured')
     }
     
-    console.log('\n🔒 Security Check:')
-    console.log(`   JWT Secret: ${config.JWT_SECRET.length >= 32 ? '✅ Secure length' : '❌ Too short'}`)
-    console.log(`   Encryption Key: ${config.ENCRYPTION_KEY.length >= 32 ? '✅ Secure length' : '❌ Too short'}`)
+    console.warn('\n🔒 Security Check:')
+    console.warn(`   JWT Secret: ${config.JWT_SECRET.length >= 32 ? '✅ Secure length' : '❌ Too short'}`)
+    console.warn(`   Encryption Key: ${config.ENCRYPTION_KEY.length >= 32 ? '✅ Secure length' : '❌ Too short'}`)
     
     if (config.NODE_ENV === 'production') {
-      console.log('\n⚠️  Production Environment Warnings:')
+      console.warn('\n⚠️  Production Environment Warnings:')
       
       if (config.JWT_SECRET.includes('change-this') || config.JWT_SECRET.includes('example')) {
-        console.log('   - JWT_SECRET appears to be a default value')
+        console.warn('   - JWT_SECRET appears to be a default value')
       }
       
       if (config.ENCRYPTION_KEY.includes('change-this') || config.ENCRYPTION_KEY.includes('example')) {
-        console.log('   - ENCRYPTION_KEY appears to be a default value')
+        console.warn('   - ENCRYPTION_KEY appears to be a default value')
       }
       
       if (config.CORS_ORIGIN === '*') {
-        console.log('   - CORS_ORIGIN is set to wildcard (*)')
+        console.warn('   - CORS_ORIGIN is set to wildcard (*)')
       }
       
       if (!config.DATABASE_DIR) {
-        console.log('   - Database is running in memory mode (data will be lost on restart)')
+        console.warn('   - Database is running in memory mode (data will be lost on restart)')
       }
     }
     
-    console.log('\n✅ Configuration check completed')
+    console.warn('\n✅ Configuration check completed')
     
   } catch (error) {
     console.error('❌ Configuration check failed:', error)
@@ -174,7 +174,7 @@ function checkCommand(_args: string[]): void {
 
 // Show help information
 function helpCommand(_args: string[]): void {
-  console.log(`
+  console.warn(`
 EnvKey Lite Configuration CLI
 
 Usage: node config-cli.js <command> [options]

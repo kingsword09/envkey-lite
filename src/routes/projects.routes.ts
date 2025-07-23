@@ -41,7 +41,7 @@ export function createProjectRoutes(
   // Create a new project
   app.post('/',
     validator('json', (value, _c) => {
-      const { name, description } = value as any
+      const { name, description } = value as Record<string, unknown>
       
       if (!name || typeof name !== 'string' || name.trim().length === 0) {
         throw new HTTPException(400, { message: 'Project name is required' })
@@ -186,7 +186,7 @@ export function createProjectRoutes(
   // Update a project
   app.put('/:projectId',
     validator('json', (value, _c) => {
-      const { name, description } = value as any
+      const { name, description } = value as Record<string, unknown>
       
       const updateData: UpdateProjectData = {}
       
@@ -300,7 +300,7 @@ export function createProjectRoutes(
   // Create a new environment for a project
   app.post('/:projectId/environments',
     validator('json', (value, _c) => {
-      const { name } = value as any
+      const { name } = value as Record<string, unknown>
       
       if (!name || typeof name !== 'string' || name.trim().length === 0) {
         throw new HTTPException(400, { message: 'Environment name is required' })
@@ -560,7 +560,7 @@ export function createProjectRoutes(
   // Grant permission to a user
   app.post('/:projectId/permissions',
     validator('json', (value, _c) => {
-      const { userId, role } = value as any
+      const { userId, role } = value as Record<string, unknown>
       
       if (!userId || typeof userId !== 'string') {
         throw new HTTPException(400, { message: 'User ID is required' })

@@ -319,7 +319,7 @@ export class PerformanceMonitor {
   /**
    * Get client IP address
    */
-  private getClientIP(c: any): string {
+  private getClientIP(c: unknown): string {
     return c.req.header('x-forwarded-for') || 
            c.req.header('x-real-ip') || 
            c.req.header('cf-connecting-ip') ||

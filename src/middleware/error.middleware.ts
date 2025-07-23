@@ -37,7 +37,7 @@ export interface ErrorResponse {
   error: {
     code: string
     message: string
-    details?: Record<string, any>
+    details?: Record<string, unknown>
     timestamp: string
     requestId: string
   }
@@ -48,7 +48,7 @@ export class ValidationError extends Error {
   constructor(
     public code: ErrorCode,
     message: string,
-    public details?: Record<string, any>
+    public details?: Record<string, unknown>
   ) {
     super(message)
     this.name = 'ValidationError'
@@ -79,7 +79,7 @@ export class ResourceError extends Error {
   constructor(
     public code: ErrorCode,
     message: string,
-    public details?: Record<string, any>
+    public details?: Record<string, unknown>
   ) {
     super(message)
     this.name = 'ResourceError'
@@ -90,7 +90,7 @@ export class SystemError extends Error {
   constructor(
     public code: ErrorCode,
     message: string,
-    public details?: Record<string, any>
+    public details?: Record<string, unknown>
   ) {
     super(message)
     this.name = 'SystemError'
@@ -101,12 +101,12 @@ function generateRequestId(): string {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
 }
 
-export const errorHandler = (error: any, c: any) => {
-  const requestId = (c.get && c.get('requestId')) || generateRequestId()
+export const errorHandler = (error: unknown, c: unknown): Response => {
+  const requestId = (c as { get?: (key: string) => string }).get?.('requestId') || generateRequestId()
   
   // Handle HTTPException from Hono
   if (error instanceof HTTPException) {
-    return c.json({
+    return (c as { json: (obj: unknown, status?: number) => Response }).json({
       error: {
         code: `HTTP_${error.status}`,
         message: error.message,
@@ -118,7 +118,7 @@ export const errorHandler = (error: any, c: any) => {
   
   // Handle custom validation errors
   if (error instanceof ValidationError) {
-    return c.json({
+    return (c as { json: (obj: unknown, status?: number) => Response }).json({
       error: {
         code: error.code,
         message: error.message,
@@ -131,7 +131,7 @@ export const errorHandler = (error: any, c: any) => {
   
   // Handle authentication errors
   if (error instanceof AuthenticationError) {
-    return c.json({
+    return (c as { json: (obj: unknown, status?: number) => Response }).json({
       error: {
         code: error.code,
         message: error.message,
@@ -143,7 +143,7 @@ export const errorHandler = (error: any, c: any) => {
   
   // Handle authorization errors
   if (error instanceof AuthorizationError) {
-    return c.json({
+    return (c as { json: (obj: unknown, status?: number) => Response }).json({
       error: {
         code: error.code,
         message: error.message,
@@ -158,7 +158,7 @@ export const errorHandler = (error: any, c: any) => {
     const status = error.code === ErrorCode.RESOURCE_NOT_FOUND ? 404 : 
                   error.code === ErrorCode.RESOURCE_ALREADY_EXISTS ? 409 : 400
     
-    return c.json({
+    return (c as { json: (obj: unknown, status?: number) => Response }).json({
       error: {
         code: error.code,
         message: error.message,
@@ -171,7 +171,7 @@ export const errorHandler = (error: any, c: any) => {
   
   // Handle system errors
   if (error instanceof SystemError) {
-    return c.json({
+    return (c as { json: (obj: unknown, status?: number) => Response }).json({
       error: {
         code: error.code,
         message: error.message,
@@ -183,7 +183,7 @@ export const errorHandler = (error: any, c: any) => {
   }
   
   // Handle unknown errors
-  return c.json({
+  return (c as { json: (obj: unknown, status?: number) => Response }).json({
     error: {
       code: ErrorCode.INTERNAL_ERROR,
       message: 'Internal server error',

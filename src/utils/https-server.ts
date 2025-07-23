@@ -46,8 +46,8 @@ function loadSSLCertificates(certPath: string, keyPath: string): { cert: string;
 /**
  * Create HTTP redirect handler for HTTPS
  */
-function createHttpsRedirectHandler(httpsPort: number) {
-  return (req: any, res: any) => {
+function createHttpsRedirectHandler(httpsPort: number): (req: unknown, res: unknown) => void {
+  return (req: unknown, res: unknown): void => {
     const host = req.headers.host?.split(':')[0] || 'localhost'
     const httpsUrl = `https://${host}${httpsPort !== 443 ? `:${httpsPort}` : ''}${req.url}`
     
@@ -115,10 +115,10 @@ export function createServers(
         
         if (response.body) {
           response.body.pipeTo(new WritableStream({
-            write(chunk) {
+            write(chunk): void {
               res.write(chunk)
             },
-            close() {
+            close(): void {
               res.end()
             }
           }))
@@ -165,10 +165,10 @@ export function createServers(
           
           if (response.body) {
             response.body.pipeTo(new WritableStream({
-              write(chunk) {
+              write(chunk): void {
                 res.write(chunk)
               },
-              close() {
+              close(): void {
                 res.end()
               }
             }))
@@ -184,7 +184,7 @@ export function createServers(
       
       serverConfig.httpsPort = httpsPort
       
-      console.log(`✅ HTTPS server configured on port ${httpsPort}`)
+      console.warn(`✅ HTTPS server configured on port ${httpsPort}`)
     } catch (error) {
       console.error('Failed to create HTTPS server:', error)
       throw error
@@ -202,25 +202,25 @@ export function startServers(serverConfig: ServerConfig): Promise<void> {
   
   // Start HTTP server
   if (serverConfig.httpServer) {
-    promises.push(new Promise((resolve, reject) => {
+    promises.push(new Promise<void>((resolve, reject) => {
       serverConfig.httpServer!.listen(serverConfig.httpPort, serverConfig.hostname, () => {
-        console.log(`🌐 HTTP server listening on http://${serverConfig.hostname}:${serverConfig.httpPort}`)
+        console.warn(`🌐 HTTP server listening on http://${serverConfig.hostname}:${serverConfig.httpPort}`)
         resolve()
       })
       
-      serverConfig.httpServer!.on('error', reject)
+      serverConfig.httpServer!.on('error', (err: Error) => reject(err))
     }))
   }
   
   // Start HTTPS server
   if (serverConfig.httpsServer && serverConfig.httpsPort) {
-    promises.push(new Promise((resolve, reject) => {
+    promises.push(new Promise<void>((resolve, reject) => {
       serverConfig.httpsServer!.listen(serverConfig.httpsPort!, serverConfig.hostname, () => {
-        console.log(`🔒 HTTPS server listening on https://${serverConfig.hostname}:${serverConfig.httpsPort}`)
+        console.warn(`🔒 HTTPS server listening on https://${serverConfig.hostname}:${serverConfig.httpsPort}`)
         resolve()
       })
       
-      serverConfig.httpsServer!.on('error', reject)
+      serverConfig.httpsServer!.on('error', (err: Error) => reject(err))
     }))
   }
   
@@ -234,13 +234,13 @@ export function stopServers(serverConfig: ServerConfig): Promise<void> {
   const promises: Promise<void>[] = []
   
   if (serverConfig.httpServer) {
-    promises.push(new Promise(resolve => {
+    promises.push(new Promise<void>(resolve => {
       serverConfig.httpServer!.close(() => resolve())
     }))
   }
   
   if (serverConfig.httpsServer) {
-    promises.push(new Promise(resolve => {
+    promises.push(new Promise<void>(resolve => {
       serverConfig.httpsServer!.close(() => resolve())
     }))
   }

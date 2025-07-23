@@ -42,7 +42,7 @@ export class ProjectService {
    * @returns The created project
    */
   async createProject(data: CreateProjectData): Promise<Project> {
-    const db = this.dbManager.getDb()
+    const _db = this.dbManager.getDb()
 
     return this.dbManager.transaction(async (tx) => {
       // Create the project

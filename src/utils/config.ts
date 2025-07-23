@@ -189,14 +189,14 @@ export function loadConfig(): Config {
     const config = validateConfig(finalEnv)
     
     // Log configuration summary (without sensitive values)
-    console.log('Configuration loaded successfully:')
-    console.log(`  - Environment: ${config.NODE_ENV}`)
-    console.log(`  - Server: ${config.HOST}:${config.PORT}`)
-    console.log(`  - HTTPS: ${config.HTTPS_ENABLED ? `Enabled on port ${config.HTTPS_PORT}` : 'Disabled'}`)
-    console.log(`  - Database: ${config.DATABASE_DIR ? 'File-based' : 'In-memory'}`)
-    console.log(`  - Log Level: ${config.LOG_LEVEL}`)
-    console.log(`  - Security Headers: ${config.SECURITY_HEADERS_ENABLED ? 'Enabled' : 'Disabled'}`)
-    console.log(`  - Health Check: ${config.HEALTH_CHECK_ENABLED ? 'Enabled' : 'Disabled'}`)
+    console.warn('Configuration loaded successfully:')
+    console.warn(`  - Environment: ${config.NODE_ENV}`)
+    console.warn(`  - Server: ${config.HOST}:${config.PORT}`)
+    console.warn(`  - HTTPS: ${config.HTTPS_ENABLED ? `Enabled on port ${config.HTTPS_PORT}` : 'Disabled'}`)
+    console.warn(`  - Database: ${config.DATABASE_DIR ? 'File-based' : 'In-memory'}`)
+    console.warn(`  - Log Level: ${config.LOG_LEVEL}`)
+    console.warn(`  - Security Headers: ${config.SECURITY_HEADERS_ENABLED ? 'Enabled' : 'Disabled'}`)
+    console.warn(`  - Health Check: ${config.HEALTH_CHECK_ENABLED ? 'Enabled' : 'Disabled'}`)
     
     return config
   } catch (error) {
@@ -210,7 +210,7 @@ export function validateConfigFile(filePath: string): boolean {
   try {
     const env = loadEnvFile(filePath)
     validateConfig(env)
-    console.log(`Configuration file ${filePath} is valid`)
+    console.warn(`Configuration file ${filePath} is valid`)
     return true
   } catch (error) {
     console.error(`Configuration file ${filePath} is invalid:`, error)

@@ -87,7 +87,7 @@ let dbManager: DatabaseManager
 let cryptoService: CryptoService
 let serverConfig: ServerConfig
 
-async function initializeServices() {
+async function initializeServices(): Promise<void> {
   // Validate security configuration
   const securityValidation = validateSecurityConfig()
   if (!securityValidation.isValid) {

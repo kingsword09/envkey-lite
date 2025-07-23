@@ -43,7 +43,7 @@ export function createAuthRoutes(
   // User registration endpoint
   app.post('/register', 
     validator('json', (value, _c) => {
-      const { email, name, password, role } = value as any
+      const { email, name, password, role } = value as Record<string, unknown>
       
       if (!email || typeof email !== 'string' || !email.includes('@')) {
         throw new HTTPException(400, { message: 'Invalid email address' })
@@ -120,7 +120,7 @@ export function createAuthRoutes(
   // User login endpoint
   app.post('/login',
     validator('json', (value, _c) => {
-      const { email, password } = value as any
+      const { email, password } = value as Record<string, unknown>
       
       if (!email || typeof email !== 'string' || !email.includes('@')) {
         throw new HTTPException(400, { message: 'Invalid email address' })
@@ -212,7 +212,7 @@ export function createAuthRoutes(
   app.put('/me',
     authMiddleware,
     validator('json', (value, _c) => {
-      const { name, email } = value as any
+      const { name, email } = value as Record<string, unknown>
       
       const updateData: UpdateUserData = {}
       
@@ -285,7 +285,7 @@ export function createAuthRoutes(
   app.post('/change-password',
     authMiddleware,
     validator('json', (value, _c) => {
-      const { currentPassword, newPassword } = value as any
+      const { currentPassword, newPassword } = value as Record<string, unknown>
       
       if (!currentPassword || typeof currentPassword !== 'string') {
         throw new HTTPException(400, { message: 'Current password is required' })
@@ -354,7 +354,7 @@ export function createAuthRoutes(
   app.post('/api-keys',
     authMiddleware,
     validator('json', (value, _c) => {
-      const { name } = value as any
+      const { name } = value as Record<string, unknown>
       
       if (!name || typeof name !== 'string' || name.trim().length === 0) {
         throw new HTTPException(400, { message: 'API key name is required' })

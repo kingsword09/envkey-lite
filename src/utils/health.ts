@@ -23,7 +23,7 @@ export interface HealthCheck {
   status: 'pass' | 'fail' | 'warn'
   message: string
   responseTime?: number
-  details?: Record<string, any>
+  details?: Record<string, unknown>
 }
 
 export class HealthMonitor {
@@ -212,7 +212,7 @@ export class HealthMonitor {
   /**
    * Get system information
    */
-  getSystemInfo() {
+  getSystemInfo(): Record<string, unknown> {
     return {
       node: {
         version: process.version,

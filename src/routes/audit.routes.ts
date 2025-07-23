@@ -49,7 +49,7 @@ export function createAuditRoutes(
         endDate,
         page,
         pageSize
-      } = value as any
+      } = value as Record<string, unknown>
 
       const filters: AuditFilters = {}
 
@@ -283,7 +283,7 @@ export function createAuditRoutes(
   // Search audit logs (admin only)
   app.get('/logs/search',
     validator('query', (value, _c) => {
-      const { q, userId, action, resource, startDate, endDate, page, pageSize } = value as any
+      const { q, userId, action, resource, startDate, endDate, page, pageSize } = value as Record<string, unknown>
 
       if (!q || typeof q !== 'string' || q.trim().length === 0) {
         throw new HTTPException(400, { message: 'Search query is required' })
@@ -496,7 +496,7 @@ export function createAuditRoutes(
   // Clean up old audit logs (admin only)
   app.post('/cleanup',
     validator('json', (value, _c) => {
-      const { retentionDays } = value as any
+      const { retentionDays } = value as Record<string, unknown>
 
       if (retentionDays !== undefined) {
         if (typeof retentionDays !== 'number' || retentionDays < 1 || retentionDays > 3650) {

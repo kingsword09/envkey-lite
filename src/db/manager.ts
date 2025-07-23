@@ -264,7 +264,7 @@ export class DatabaseManager {
    * Get the schema objects
    * @returns The database schema objects
    */
-  getSchema() {
+  getSchema(): typeof schema {
     return this.schema
   }
 

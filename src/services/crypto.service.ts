@@ -328,7 +328,7 @@ export class CryptoService {
 
       // Compare the hashes
       return crypto.timingSafeEqual(derivedKey, storedHash)
-    } catch (error) {
+    } catch (_error) {
       return false
     }
   }
@@ -655,8 +655,8 @@ export class CryptoService {
       await this.storeMasterKeyInDb(this.keyId!, this.masterKey)
       
       return true
-    } catch (error) {
-      console.error('Key import failed:', error)
+    } catch (_error) {
+      console.error('Key import failed:', _error)
       return false
     }
   }

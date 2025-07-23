@@ -47,7 +47,7 @@ export function createEnvironmentRoutes(
     userId: string, 
     environmentId: string, 
     requiredRole: 'viewer' | 'editor' | 'admin' = 'viewer'
-  ) => {
+  ): Promise<{ id: string; name: string; projectId: string; createdAt: Date; updatedAt: Date }> => {
     // Get environment to find project
     const environment = await projectService.getEnvironment(environmentId)
     if (!environment) {
@@ -197,7 +197,7 @@ export function createEnvironmentRoutes(
   // Set/update a variable
   app.put('/environments/:environmentId/variables/:key',
     validator('json', (value) => {
-      const { value: varValue, sensitive, description } = value as any
+      const { value: varValue, sensitive, description } = value as Record<string, unknown>
       
       if (varValue === undefined || varValue === null) {
         throw new HTTPException(400, { message: 'Variable value is required' })
@@ -352,7 +352,7 @@ export function createEnvironmentRoutes(
   // Batch set variables
   app.post('/environments/:environmentId/variables/batch',
     validator('json', (value) => {
-      const { variables, options } = value as any
+      const { variables, options } = value as Record<string, unknown>
       
       if (!variables || typeof variables !== 'object') {
         throw new HTTPException(400, { message: 'Variables object is required' })
@@ -492,7 +492,7 @@ export function createEnvironmentRoutes(
   // Export variables
   app.get('/environments/:environmentId/export',
     validator('query', (value) => {
-      const { format } = value as any
+      const { format } = value as Record<string, unknown>
       
       const validFormats: ExportFormat[] = ['json', 'dotenv', 'yaml']
       const exportFormat: ExportFormat = format && validFormats.includes(format) ? format : 'json'
@@ -565,7 +565,7 @@ export function createEnvironmentRoutes(
   // Import variables
   app.post('/environments/:environmentId/import',
     validator('form', (value) => {
-      const { format, data } = value as any
+      const { format, data } = value as Record<string, unknown>
       
       if (!data || typeof data !== 'string') {
         throw new HTTPException(400, { message: 'Import data is required' })
@@ -639,7 +639,7 @@ export function createEnvironmentRoutes(
   // Copy variables between environments
   app.post('/environments/:environmentId/copy',
     validator('json', (value) => {
-      const { targetEnvironmentId, overwrite } = value as any
+      const { targetEnvironmentId, overwrite } = value as Record<string, unknown>
       
       if (!targetEnvironmentId || typeof targetEnvironmentId !== 'string') {
         throw new HTTPException(400, { message: 'Target environment ID is required' })

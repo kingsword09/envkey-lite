@@ -441,7 +441,7 @@ export class EnvironmentVariableService {
         return Object.entries(variablesObj)
           .map(([key, value]) => {
             // Escape special characters in YAML
-            const needsQuotes = /[:#{}[\],&*?|<>=!%@\`]/.test(value) || value === ''
+            const needsQuotes = /[:#{}[\],&*?|<>=!%@`]/.test(value) || value === ''
             const formattedValue = needsQuotes ? `"${value.replace(/"/g, '\\"')}"` : value
 
             return `${key}: ${formattedValue}`

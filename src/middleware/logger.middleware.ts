@@ -48,7 +48,7 @@ export const loggerMiddleware = (options: LoggerOptions = {}): MiddlewareHandler
         ...(logHeaders && { headers: Object.fromEntries(c.req.raw.headers.entries()) })
       }
       
-      console.log(`[${requestId}] → ${method} ${path}`, requestLog)
+      console.warn(`[${requestId}] → ${method} ${path}`, requestLog)
     }
     
     await next()
@@ -81,7 +81,7 @@ export const loggerMiddleware = (options: LoggerOptions = {}): MiddlewareHandler
           console.warn(logMessage, responseLog)
           break
         default:
-          console.log(logMessage, responseLog)
+          console.warn(logMessage, responseLog)
       }
     }
   }
