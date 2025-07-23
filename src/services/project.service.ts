@@ -406,6 +406,25 @@ export class ProjectService {
   }
 
   /**
+   * Get a project with its environments
+   * @param projectId Project ID
+   * @returns Project with environments or null if not found
+   */
+  async getProjectWithEnvironments(projectId: string): Promise<(Project & { environments: Environment[] }) | null> {
+    const project = await this.getProject(projectId)
+    if (!project) {
+      return null
+    }
+    
+    const projectEnvironments = await this.listEnvironments(projectId)
+    
+    return {
+      ...project,
+      environments: projectEnvironments
+    }
+  }
+
+  /**
    * Transfer project ownership to another user
    * @param projectId Project ID
    * @param newOwnerId New owner user ID

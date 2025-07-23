@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Hono } from 'hono'
 import { corsMiddleware } from './cors.middleware'
-import { errorHandler, ValidationError, ErrorCode } from './error.middleware'
+import { errorMiddleware, ValidationError, ErrorCode } from './error.middleware'
 import { loggerMiddleware } from './logger.middleware'
 
 describe('Middleware Tests', () => {
